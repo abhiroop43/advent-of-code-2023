@@ -11,6 +11,7 @@ using var sr = new StreamReader("input.txt");
 while (sr.ReadLine() is { } line) lines.Add(line);
 
 Dictionary<int, bool> gamePossibilities = new Dictionary<int, bool>();
+Dictionary<int, int> gamePowers = new Dictionary<int, int>();
 
 foreach (var input in lines)
 {
@@ -32,47 +33,58 @@ foreach (var input in lines)
     var blueBalls = new List<int>();
     foreach (Match match in blueMatches)
     {
-        if (int.TryParse(match.Groups[1].Value, out int count))
-        {
-            blueBalls.Add(count);
-        }
+        if (!int.TryParse(match.Groups[1].Value, out int count)) continue;
+        blueBalls.Add(count);
     }
     
     var redBalls = new List<int>();
     foreach (Match match in redMatches)
     {
-        if (int.TryParse(match.Groups[1].Value, out int count))
-        {
-            redBalls.Add(count);
-        }
+        if (!int.TryParse(match.Groups[1].Value, out int count)) continue;
+        redBalls.Add(count);
     }
 
     var greenBalls = new List<int>();
     foreach (Match match in greenMatches)
     {
-        if (int.TryParse(match.Groups[1].Value, out int count))
-        {
-            greenBalls.Add(count);
-        }
+        if (!int.TryParse(match.Groups[1].Value, out int count)) continue;
+        greenBalls.Add(count);
     }
+
+    var maxBlueBalls = blueBalls.Max();
+    var maxGreenBalls = greenBalls.Max();
+    var maxRedBalls = redBalls.Max();
     
-    if(blueBalls.Max() > TOTAL_BLUE_BALLS || redBalls.Max() > TOTAL_RED_BALLS || greenBalls.Max() > TOTAL_GREEN_BALLS)
+    if(maxBlueBalls > TOTAL_BLUE_BALLS 
+       || maxGreenBalls > TOTAL_RED_BALLS 
+       || maxRedBalls > TOTAL_GREEN_BALLS)
     {
         gamePossible = false;
     }
     // Console.WriteLine($"Key: {gameNumber}, Value: {gamePossible}");
     gamePossibilities.Add(gameNumber, gamePossible);
+    
+    var gamePower = maxBlueBalls * maxGreenBalls * maxRedBalls;
+    // Console.WriteLine($"Key: {gameNumber}, Value: {gamePower}");
+    gamePowers.Add(gameNumber, gamePower);
 }
 
 
 // add the game numbers where the game is possible
-int totalPossibleGames = 0;
-foreach (var game in gamePossibilities)
+var totalPossibleGames = gamePossibilities
+    .Where(game => game.Value)
+    .Sum(game => game.Key);
+
+int totalGamePower = 0;
+foreach (var game in gamePowers)
 {
-    if (game.Value)
+    if (gamePowers[game.Key] != 0)
     {
-        totalPossibleGames += game.Key;
+        totalGamePower += game.Value;
     }
 }
 
+
+
 Console.WriteLine(totalPossibleGames);
+Console.WriteLine(totalGamePower);
